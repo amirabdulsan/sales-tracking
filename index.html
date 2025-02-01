@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sales Bulanan</title>
+    
+</head>
+<body>
+
+    <h1>SALES BULANAN</h1>
+
+    <p id="bulan"></p>
+
+    <script>
+        const month = ["January", "Feb", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const d = new Date();
+        let name = month[d.getMonth()];
+        document.getElementById("bulan").innerHTML = "Sales Bulan-*" + name +"*";
+    </script>
+
+    <p id="formattedDate"></p>
+    <p id="formattedDate1"></p>
+
+    <script>
+        let today = new Date();
+        let day1 = String(today.getDate()).padStart(2, '0');
+        let month1 = String(today.getMonth() + 1).padStart(2, '0');
+        let year1 = String(today.getFullYear()).slice(-2);
+        document.getElementById("formattedDate").innerHTML = `A) To date ${month1}/${year1} = `;
+    </script>
+
+    <script>
+        // For last year's sales, setting the same day of the week as today
+        let lastYearDate = new Date(today);
+        lastYearDate.setFullYear(lastYearDate.getFullYear() - 1); // Setting to last year
+
+        // Adjust the day to match the same weekday
+        let targetDayOfWeek = today.getDay(); // Get the day of the week (0-6)
+        let currentDayOfWeek = lastYearDate.getDay();
+
+        // Find the difference in days and adjust the date for the same weekday
+        let diffInDays = targetDayOfWeek - currentDayOfWeek;
+        lastYearDate.setDate(lastYearDate.getDate() + diffInDays); // Adjust date to match the same weekday
+
+        // Format the dates
+        let dayLastYear = String(lastYearDate.getDate()).padStart(2, '0');
+        let monthLastYear = String(lastYearDate.getMonth() + 1).padStart(2, '0');
+        let yearLastYear = String(lastYearDate.getFullYear()).slice(-2);
+        document.getElementById("formattedDate1").innerHTML = `B) To date ${monthLastYear}/${yearLastYear} = `;
+    </script>
+
+    <!-- Difference Section -->
+    <div id="differenceSection">
+        <p id="salesDifference">Difference: RM 0</p>
+    </div>
+
+    ◼ Day ◼ Date ◼ Sales (RM) ◼ No.Customer
+
+    <!-- Container for Today's Sales -->
+    <div id="salesContainer">
+        <p id="formattedDate3"></p> <!-- Formatted Date for current day -->
+
+        <!-- Input Fields for today's sales and number of customers -->
+        <div id="salesForm">
+            <label for="salesAmountToday"> </label>
+            <input type="number" id="salesAmountToday" placeholder="Enter today's sales amount">
+
+            <label for="noCustomersToday"></label>
+            <input type="number" id="noCustomersToday" placeholder="Enter number of customers"><br><br>
+        </div>
+    </div>
+
+    <!-- Container for Last Year's Sales -->
+    <div id="salesContainer">
+        <p id="formattedDate4"></p> <!-- Formatted Date for last year's sales -->
+
+        <!-- Input Fields for last year's sales and number of customers -->
+        <div id="salesForm">
+            <label for="salesAmountLastYear"> </label>
+            <input type="number" id="salesAmountLastYear" placeholder="Enter last year's sales amount">
+
+            <label for="noCustomersLastYear"></label>
+            <input type="number" id="noCustomersLastYear" placeholder="Enter number of customers"><br><br>
+        </div>
+    </div>
+
+    <!-- Submit Button below both input sections -->
+    <div id="salesForm">
+        <button onclick="updateSales()">Submit Sales</button> <!-- Button for both sales -->
+    </div>
+
+    <!-- Sales History Section for Today and Last Year Sales -->
+    <div id="salesHistory">
+        <div id="salesHistoryList">
+            <!-- History will be populated here -->
+        </div>
+    </div>
+     
+    <div id="buttoncontainer">
+    <!-- Copy Button -->
+        <button onclick="copySalesData()">Copy All Sales Data</button>
+    <!-- Clear Buttons -->
+        <button onclick="clearHistory()">Clear All History</button>
+        <button onclick="clearLastEntry()">Clear Last Entry</button>
+     </div>
+
+    <script>
+        // Get current date for today's sales
+        let today3 = new Date();
+        let daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        let dayOfWeekToday = daysOfWeek[today3.getDay()];
+        let formattedDateToday = `${dayOfWeekToday} ${day1}/${month1}/${year1} -`;
+        document.getElementById("formattedDate3").innerHTML = formattedDateToday;
+
+        // Get last year's same weekday for formattedDate4
+        let formattedDateLastYear = `${dayOfWeekToday} ${dayLastYear}/${monthLastYear}/${yearLastYear} - `;
+        document.getElementById("formattedDate4").innerHTML = formattedDateLastYear;
+    </script>
+
+    <script>
+        // Initialize sales variables
+        let totalSalesToday = 0;
+        let totalSalesLastYear = 0;
+
+        // Array to hold sales history
+        let salesHistory = [];
+
+        // Function to format sales data to be currency with thousands separator and sen
+        function formatCurrency(amount) {
+            return "RM" + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); // Format with thousands separator and 2 decimal places for sen
+        }
+
+        // Function to save sales data to local storage
+function saveSalesData() {
+    const data = {
+        totalSalesToday,
+        totalSalesLastYear,
+        salesHistory,
+        lastUpdated: new Date().getTime() // Store timestamp
+    };
+    localStorage.setItem("salesData", JSON.stringify(data));
+}
+
+// Function to load sales data from local storage
+function loadSalesData() {
+    const savedData = localStorage.getItem("salesData");
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        const currentTime = new Date().getTime();
+        const oneMonth = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+        if (currentTime - data.lastUpdated < oneMonth) {
+            totalSalesToday = data.totalSalesToday;
+            totalSalesLastYear = data.totalSalesLastYear;
+            salesHistory = data.salesHistory;
+        } else {
+            clearHistory(); // Auto-clear if older than 30 days
+        }
+    }
+    displayTotalSalesToday();
+    displayTotalSalesLastYear();
+    displaySalesHistory();
+    displaySalesDifference();
+}
+
+
+function updateSales() {
+    let salesAmountToday = parseFloat(document.getElementById("salesAmountToday").value);
+    let noCustomersToday = document.getElementById("noCustomersToday").value;
+    let salesAmountLastYear = parseFloat(document.getElementById("salesAmountLastYear").value);
+    let noCustomersLastYear = document.getElementById("noCustomersLastYear").value;
+
+    // Get today's formatted date for comparison
+    let todayFormatted = `${dayOfWeekToday} ${day1}/${month1}/${year1}`;
+
+    // Check if sales for today have already been submitted
+    let existingEntryForToday = salesHistory.some(entry => entry.dateToday === todayFormatted);
+
+    if (existingEntryForToday) {
+        alert("Sales for today have already been submitted!");
+
+        // Clear the input fields after warning
+        document.getElementById("salesAmountToday").value = "";
+        document.getElementById("noCustomersToday").value = "";
+        document.getElementById("salesAmountLastYear").value = "";
+        document.getElementById("noCustomersLastYear").value = "";
+        
+        return; // Prevent further action if an entry already exists for today
+    }
+
+    if (salesAmountToday && noCustomersToday && salesAmountLastYear && noCustomersLastYear) {
+        totalSalesToday += salesAmountToday;
+        totalSalesLastYear += salesAmountLastYear;
+
+        let combinedEntry = {
+            dateToday: todayFormatted,
+            salesToday: formatCurrency(salesAmountToday),
+            customersToday: noCustomersToday,
+            dateLastYear: document.getElementById("formattedDate4").innerText,
+            salesLastYear: formatCurrency(salesAmountLastYear),
+            customersLastYear: noCustomersLastYear
+        };
+
+        salesHistory.push(combinedEntry);
+        if (salesHistory.length > 30) salesHistory.shift(); // Limit to last 30 entries
+
+        saveSalesData(); // Save updated data to local storage
+
+        displayTotalSalesToday();
+        displayTotalSalesLastYear();
+        displaySalesHistory();
+        displaySalesDifference();
+
+        // Clear input fields after successful submission
+        document.getElementById("salesAmountToday").value = "";
+        document.getElementById("noCustomersToday").value = "";
+        document.getElementById("salesAmountLastYear").value = "";
+        document.getElementById("noCustomersLastYear").value = "";
+    } else {
+        alert('Please fill in all fields for both today\'s and last year\'s sales');
+    }
+}
+
+
+
+
+        // Function to display total sales for today
+        function displayTotalSalesToday() {
+            document.getElementById("formattedDate").innerHTML = `A) To date ${month1}/${year1} = ${formatCurrency(totalSalesToday)}`;
+        }
+
+        // Function to display total sales for last year
+        function displayTotalSalesLastYear() {
+            document.getElementById("formattedDate1").innerHTML = `B) To date ${monthLastYear}/${yearLastYear} = ${formatCurrency(totalSalesLastYear)}`;
+        }
+
+        // Function to display the sales history
+        function displaySalesHistory() {
+            let salesHistoryList = document.getElementById("salesHistoryList");
+            salesHistoryList.innerHTML = ""; // Clear previous entries
+
+            // Loop through the sales history and add it as a new entry
+            // Reverse the history so the latest entry appears first
+            salesHistory.slice().reverse().forEach(entry => {
+                let entryElement = document.createElement("div");
+                entryElement.classList.add("salesEntry");
+
+                // Display the date followed by today's and last year's sales
+                entryElement.innerHTML = `
+                    <p><strong>${entry.dateToday} - ${entry.salesToday} ${entry.customersToday}</p>
+                    <p><strong>${entry.dateLastYear} ${entry.salesLastYear} ${entry.customersLastYear}</p>
+                `;
+
+                salesHistoryList.appendChild(entryElement);
+            });
+        }
+
+        // Function to display the difference between today's and last year's sales
+        function displaySalesDifference() {
+            let difference = totalSalesToday - totalSalesLastYear; // Calculate the difference
+            document.getElementById("salesDifference").innerHTML = `Difference: ${formatCurrency(difference)}`;
+        }
+
+        // Function to copy all sales data
+        function copySalesData() {
+            let salesData = `
+Sales Bulan-*${name}*
+A) To date ${month1}/${year1} = ${formatCurrency(totalSalesToday)}
+B) To date ${monthLastYear}/${yearLastYear} = ${formatCurrency(totalSalesLastYear)}
+Difference: ${formatCurrency(totalSalesToday - totalSalesLastYear)}
+
+◼ Day ◼ Date ◼ Sales (RM) ◼ No.Customer
+`;
+
+            salesHistory.slice().reverse().forEach(entry => {
+                salesData += `
+${entry.dateToday} - ${entry.salesToday} ${entry.customersToday}
+${entry.dateLastYear} ${entry.salesLastYear} ${entry.customersLastYear}
+`;
+            });
+
+            // Copy the formatted sales data to clipboard
+            navigator.clipboard.writeText(salesData).then(() => {
+                alert("Sales data copied to clipboard!");
+            });
+        }
+
+        function clearHistory() {
+    totalSalesToday = 0;
+    totalSalesLastYear = 0;
+    salesHistory = [];
+    localStorage.removeItem("salesData"); // Remove stored data
+    displayTotalSalesToday();
+    displayTotalSalesLastYear();
+    displaySalesHistory();
+    displaySalesDifference();
+    alert("Sales history cleared!");
+}
+
+function clearLastEntry() {
+    if (salesHistory.length > 0) {
+        let lastEntry = salesHistory.pop(); // Remove the last entry
+
+        // Parse sales data correctly before subtracting
+        let lastSalesToday = parseFloat(lastEntry.salesToday.replace('RM', '').replace(',', '').replace(' sen', '').trim());
+        let lastSalesLastYear = parseFloat(lastEntry.salesLastYear.replace('RM', '').replace(',', '').replace(' sen', '').trim());
+
+        // Check if the parsed values are valid numbers, otherwise set them to 0
+        lastSalesToday = isNaN(lastSalesToday) ? 0 : lastSalesToday;
+        lastSalesLastYear = isNaN(lastSalesLastYear) ? 0 : lastSalesLastYear;
+
+        // Subtract the last entry's sales from the totals
+        totalSalesToday -= lastSalesToday;
+        totalSalesLastYear -= lastSalesLastYear;
+
+        // Update the display
+        displaySalesHistory();
+        displayTotalSalesToday();
+        displayTotalSalesLastYear();
+        displaySalesDifference();
+        alert("Last entry cleared!");
+    } else {
+        alert("No entries to clear.");
+    }
+}
+
+        // Initial display of the sales data
+        displayTotalSalesToday();
+        displayTotalSalesLastYear();
+
+        loadSalesData();
+    </script>
+
+</body>
+</html>
+
+    
+</body>
+</html>

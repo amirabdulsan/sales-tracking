@@ -1,0 +1,66 @@
+
+        /* Flexbox layout for the formatted date and input form */
+        #salesContainer {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+           
+     
+
+        }
+
+        
+
+        /* Adding some space between formatted date and input form */
+        #salesForm {
+            margin-left: 10px;
+            margin-top: 20px;
+        }
+
+        #salesOutput {
+            margin-top: 30px;
+            margin-left: 100px;
+        }
+
+        /* Added styling for the last year's sales display */
+        #formattedDate4 {
+            margin-top: 20px;
+            font-weight: normal;
+        }
+
+        /* Styling for sales history */
+        #salesHistory {
+            margin-top: 10px;
+        }
+
+        .salesEntry {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            padding: 10px;
+            border: 1px #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .salesEntry p {
+            margin: 5px 0;
+        }
+
+        /* Styling for the Difference section */
+        #differenceSection {
+            margin-top: 20px;
+            font-weight: normal;
+        }
+        #buttonContainer {
+        display: flex;
+        gap: 10px; /* Adds spacing between buttons */
+        margin-top: 20px;
+    }
+    
+    button {
+        padding: 8px 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+   
