@@ -39,17 +39,13 @@
     </script>
 
     <script>
-        // For last year's sales, setting the same day of the week as today
-        let lastYearDate = new Date(today);
-        lastYearDate.setFullYear(lastYearDate.getFullYear() - 1); // Setting to last year
+       let lastYearDate = new Date(today);
+lastYearDate.setFullYear(today.getFullYear() - 1);
 
-        // Adjust the day to match the same weekday
-        let targetDayOfWeek = today.getDay(); // Get the day of the week (0-6)
-        let currentDayOfWeek = lastYearDate.getDay();
-
-        // Find the difference in days and adjust the date for the same weekday
-        let diffInDays = targetDayOfWeek - currentDayOfWeek;
-        lastYearDate.setDate(lastYearDate.getDate() + diffInDays); // Adjust date to match the same weekday
+// Find last year's closest matching weekday
+while (lastYearDate.getDay() !== today.getDay()) {
+    lastYearDate.setDate(lastYearDate.getDate() + 1);
+}
 
         // Format the dates
         let dayLastYear = String(lastYearDate.getDate()).padStart(2, '0');
