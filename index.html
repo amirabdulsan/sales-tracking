@@ -40,11 +40,11 @@
 
     <script>
        let lastYearDate = new Date(today);
-lastYearDate.setFullYear(today.getFullYear() - 1);
+       lastYearDate.setFullYear(today.getFullYear() - 1);
 
-// Find last year's closest matching weekday
-while (lastYearDate.getDay() !== today.getDay()) {
-    lastYearDate.setDate(lastYearDate.getDate() + 1);
+       // Find last year's closest matching weekday
+        while (lastYearDate.getDay() !== today.getDay()) {
+         lastYearDate.setDate(lastYearDate.getDate() + 1);
 }
 
         // Format the dates
